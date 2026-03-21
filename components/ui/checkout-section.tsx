@@ -120,7 +120,7 @@ export function CheckoutSection() {
         const payload = await response.json().catch(() => ({}));
 
         if (response.ok && payload?.success) {
-          const redirectTo: string = payload?.data?.redirect_to ?? "http://localhost:5173/admin/dashboard";
+          const redirectTo: string = payload?.data?.redirect_to ?? "https://lokyperfumstore.eu.cc/admin/dashboard";
           setDashboardUrl(redirectTo);
           setPopupKind("success");
           setPopupMessage(payload?.message ?? "Payment confirmed. Redirecting to dashboard login...");
