@@ -328,7 +328,10 @@ export function CheckoutSection() {
       }
 
       if (!response.ok || !result?.success) {
-        setStatusMessage(result?.message ?? "Could not create checkout right now.");
+        const errorReference = typeof result?.error_reference === "string" && result.error_reference
+          ? ` Reference: ${result.error_reference}`
+          : "";
+        setStatusMessage((result?.message ?? "Could not create checkout right now.") + errorReference);
         setButtonState("error");
         return;
       }
