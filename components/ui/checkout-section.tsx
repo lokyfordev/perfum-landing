@@ -60,7 +60,6 @@ const inputClassName =
 
 export function CheckoutSection() {
   const apiBaseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://perfumbackend.eu.cc/api").replace(/\/$/, "");
-  // const apiBaseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000/api").replace(/\/$/, "");
 
   const planAmountDa = Number(process.env.NEXT_PUBLIC_PLAN_AMOUNT_DA ?? "8000");
 
@@ -122,12 +121,17 @@ export function CheckoutSection() {
         const payload = await response.json().catch(() => ({}));
 
         if (response.ok && payload?.success) {
-          const redirectTo: string = payload?.data?.redirect_to ?? "http://localhost:5173/admin/dashboard";
-          const nextStorefrontUrl: string = payload?.data?.storefront_url ?? "";
+          const storefrontCandidate: string = payload?.data?.storefront_url ?? "";
+          const redirectTo: string =
+            payload?.data?.redirect_to ??
+            (storefrontCandidate
+              ? `${String(storefrontCandidate).replace(/\/$/, "")}/login`
+              : "https://lokyperfumstore.eu.cc/login");
+          const nextStorefrontUrl: string = storefrontCandidate;
           setDashboardUrl(redirectTo);
           setStorefrontUrl(nextStorefrontUrl);
           setPopupKind("success");
-          setPopupMessage(payload?.message ?? "Payment confirmed. Redirecting to dashboard login...");
+          setPopupMessage(payload?.message ?? "Payment confirmed. Redirecting to your store login...");
           setCountdown(5);
           window.localStorage.removeItem(CHECKOUT_STORAGE_KEY);
           clearPaymentParams();
@@ -659,7 +663,7 @@ export function CheckoutSection() {
                 <p className="mt-1 text-sm text-muted-foreground">{popupMessage}</p>
                 {popupKind === "success" && (
                   <p className="mt-3 text-sm font-medium text-emerald-700">
-                    Dashboard is loading in {countdown}s...
+                    Store login is loading in {countdown}s...
                   </p>
                 )}
               </div>
