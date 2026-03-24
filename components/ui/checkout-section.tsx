@@ -74,6 +74,7 @@ export function CheckoutSection() {
   const [checkoutUrl, setCheckoutUrl] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [dashboardUrl, setDashboardUrl] = React.useState("");
+  const [storefrontUrl, setStorefrontUrl] = React.useState("");
 
   const [popupOpen, setPopupOpen] = React.useState(false);
   const [popupKind, setPopupKind] = React.useState<PopupKind>("verifying");
@@ -107,6 +108,7 @@ export function CheckoutSection() {
       setPopupOpen(true);
       setPopupKind("verifying");
       setPopupMessage("Verifying payment status...");
+      setStorefrontUrl("");
 
       try {
         const response = await fetch(
@@ -120,8 +122,10 @@ export function CheckoutSection() {
         const payload = await response.json().catch(() => ({}));
 
         if (response.ok && payload?.success) {
-          const redirectTo: string = payload?.data?.redirect_to ?? "https://lokyperfumstore.eu.cc/admin/dashboard";
+          const redirectTo: string = payload?.data?.redirect_to ?? "http://localhost:5173/admin/dashboard";
+          const nextStorefrontUrl: string = payload?.data?.storefront_url ?? "";
           setDashboardUrl(redirectTo);
+          setStorefrontUrl(nextStorefrontUrl);
           setPopupKind("success");
           setPopupMessage(payload?.message ?? "Payment confirmed. Redirecting to dashboard login...");
           setCountdown(5);
@@ -674,6 +678,15 @@ export function CheckoutSection() {
                   onClick={() => window.location.assign(dashboardUrl)}
                 >
                   Go now
+                </Button>
+              )}
+              {popupKind === "success" && storefrontUrl && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => window.open(storefrontUrl, "_blank", "noopener,noreferrer")}
+                >
+                  Open storefront
                 </Button>
               )}
             </div>
