@@ -59,8 +59,8 @@ const inputClassName =
   "h-11 rounded-xl border-border/70 bg-background/90 text-sm shadow-sm transition-[border-color,box-shadow,background-color] duration-200 placeholder:text-muted-foreground/80 focus-visible:border-primary/60 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-0";
 
 export function CheckoutSection() {
-  // const apiBaseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://perfumbackend.eu.cc/api").replace(/\/$/, "");
-  const apiBaseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api").replace(/\/$/, "");
+  const apiBaseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://perfumbackend.eu.cc/api").replace(/\/$/, "");
+  // const apiBaseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api").replace(/\/$/, "");
 
   const planAmountDa = Number(process.env.NEXT_PUBLIC_PLAN_AMOUNT_DA ?? "8000");
 
