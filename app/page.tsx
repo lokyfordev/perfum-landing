@@ -9,11 +9,13 @@ import { HeroDemo } from "@/components/blocks/animated-hero-demo"
 import { Footer } from "@/components/blocks/footer-demo"
 import { CheckoutSection } from "@/components/ui/checkout-section"
 import { Featuree } from "@/components/blocks/featuree"
+import Link from "next/link"
 
 
 export default function Page() {
   return (
     <main className="bg-background text-foreground">
+      
       <HeroSection />
       <Feature />
       <TestimonialsSectionDemo />
