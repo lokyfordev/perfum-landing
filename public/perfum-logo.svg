@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Perfum Logo</title>
+  <desc id="desc">A stylized perfume bottle mark for Perfum.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fde68a" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#bg)" />
+  <rect x="98" y="42" width="60" height="24" rx="8" fill="#e2e8f0" />
+  <rect x="90" y="64" width="76" height="18" rx="8" fill="#cbd5e1" opacity="0.9" />
+  <rect x="66" y="84" width="124" height="132" rx="30" fill="#f8fafc" />
+  <rect x="80" y="102" width="96" height="96" rx="22" fill="#93c5fd" opacity="0.3" />
+  <path d="M128 114c18 17 28 32 28 46 0 15-12 27-28 27s-28-12-28-27c0-14 10-29 28-46z" fill="url(#shine)" />
+  <path d="M80 166h96" stroke="#dbeafe" stroke-width="10" stroke-linecap="round" opacity="0.65" />
+  <circle cx="184" cy="54" r="8" fill="#fef3c7" />
+  <circle cx="201" cy="72" r="4" fill="#fef9c3" />
+</svg>

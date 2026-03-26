@@ -90,7 +90,7 @@ export const HeroSection = () => {
                 <section className="overflow-hidden bg-background">
                     <div className="relative mx-auto max-w-6xl px-6 pb-20 pt-28 md:pb-24 lg:pt-24">
                         <div className="relative z-10 mx-auto max-w-2xl text-center">
-                            <h1 className="text-balance text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl">Perfum ERP for clone and original fragrance stores</h1>
+                            <h1 className="text-balance text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl">lokyforPerfum ERP for clone and original fragrance stores</h1>
                             <p className="mx-auto my-8 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">Manage perfume inventory in ml, run clone and original sales flows, track margins automatically, and launch stores with built-in paid onboarding.</p>
 
                             <Button
@@ -207,34 +207,13 @@ export const HeroSection = () => {
 export const Logo = ({ className }: { className?: string }) => {
     return (
         <div className={cn("flex items-center gap-2", className)}>
-            {/* Bottle Icon */}
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                className="h-6 w-6"
-            >
-                <path
-                    d="M9 3h6v2H9V3Z"
-                    fill="currentColor"
-                />
-                <path
-                    d="M7 5h10l1 4v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V9l1-4Z"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    fill="none"
-                />
-                <path
-                    d="M9 11h6"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                />
-            </svg>
-
-            {/* Brand Name */}
+            <img
+                src="/perfum-logo.svg"
+                alt="Perfum logo"
+                className="h-7 w-7 rounded-md"
+            />
             <span className="text-base font-semibold tracking-tight">
-                Perfum
+                LokyforPerfum
             </span>
         </div>
     )
