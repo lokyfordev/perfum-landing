@@ -6,23 +6,44 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
 type CheckoutForm = {
   store_name: string;
   legal_name: string;
+  description: string;
   store_email: string;
   phone: string;
   whatsapp_number: string;
+  support_email: string;
+  support_phone: string;
+  website_url: string;
   address_line_1: string;
+  address_line_2: string;
   city: string;
+  state: string;
+  postal_code: string;
+  country: string;
   facebook_url: string;
   instagram_url: string;
   tiktok_url: string;
+  youtube_url: string;
+  x_url: string;
+  cover_image: string;
   owner_name: string;
   owner_email: string;
   owner_password: string;
   owner_password_confirmation: string;
+};
+
+type AutoFillState = {
+  legal_name_from_store_name: boolean;
+  whatsapp_number_from_phone: boolean;
+  support_email_from_store_email: boolean;
+  support_phone_from_phone: boolean;
+  owner_email_from_store_email: boolean;
 };
 
 type Step = 1 | 2 | 3;
@@ -34,18 +55,37 @@ const CHECKOUT_STORAGE_KEY = "perfum_landing_checkout_id";
 const initialForm: CheckoutForm = {
   store_name: "",
   legal_name: "",
+  description: "",
   store_email: "",
   phone: "",
   whatsapp_number: "",
+  support_email: "",
+  support_phone: "",
+  website_url: "",
   address_line_1: "",
+  address_line_2: "",
   city: "",
+  state: "",
+  postal_code: "",
+  country: "",
   facebook_url: "",
   instagram_url: "",
   tiktok_url: "",
+  youtube_url: "",
+  x_url: "",
+  cover_image: "",
   owner_name: "",
   owner_email: "",
   owner_password: "",
   owner_password_confirmation: "",
+};
+
+const initialAutoFill: AutoFillState = {
+  legal_name_from_store_name: true,
+  whatsapp_number_from_phone: true,
+  support_email_from_store_email: true,
+  support_phone_from_phone: true,
+  owner_email_from_store_email: true,
 };
 
 const steps = [
@@ -80,6 +120,7 @@ export function CheckoutSection() {
   const [popupKind, setPopupKind] = React.useState<PopupKind>("verifying");
   const [popupMessage, setPopupMessage] = React.useState("");
   const [countdown, setCountdown] = React.useState(5);
+  const [autoFill, setAutoFill] = React.useState<AutoFillState>(initialAutoFill);
 
   React.useEffect(() => {
     if (!logoFile) {
@@ -92,6 +133,49 @@ export function CheckoutSection() {
 
     return () => URL.revokeObjectURL(objectUrl);
   }, [logoFile]);
+
+  React.useEffect(() => {
+    setForm((prev) => {
+      const next = { ...prev };
+      let changed = false;
+
+      if (autoFill.legal_name_from_store_name && prev.legal_name !== prev.store_name) {
+        next.legal_name = prev.store_name;
+        changed = true;
+      }
+
+      if (autoFill.whatsapp_number_from_phone && prev.whatsapp_number !== prev.phone) {
+        next.whatsapp_number = prev.phone;
+        changed = true;
+      }
+
+      if (autoFill.support_email_from_store_email && prev.support_email !== prev.store_email) {
+        next.support_email = prev.store_email;
+        changed = true;
+      }
+
+      if (autoFill.support_phone_from_phone && prev.support_phone !== prev.phone) {
+        next.support_phone = prev.phone;
+        changed = true;
+      }
+
+      if (autoFill.owner_email_from_store_email && prev.owner_email !== prev.store_email) {
+        next.owner_email = prev.store_email;
+        changed = true;
+      }
+
+      return changed ? next : prev;
+    });
+  }, [
+    autoFill.legal_name_from_store_name,
+    autoFill.whatsapp_number_from_phone,
+    autoFill.support_email_from_store_email,
+    autoFill.support_phone_from_phone,
+    autoFill.owner_email_from_store_email,
+    form.store_name,
+    form.phone,
+    form.store_email,
+  ]);
 
   const fieldError = (name: keyof CheckoutForm | "logo" | "general") => errors[name]?.[0];
 
@@ -210,6 +294,11 @@ export function CheckoutSection() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  const setAutoFillField = (field: keyof AutoFillState, checked: boolean) => {
+    resetCheckoutAction();
+    setAutoFill((prev) => ({ ...prev, [field]: checked }));
+  };
+
   const validateStep = (targetStep: Step): Record<string, string[]> => {
     const nextErrors: Record<string, string[]> = {};
 
@@ -219,6 +308,9 @@ export function CheckoutSection() {
       if (!form.phone.trim()) nextErrors.phone = ["Phone is required."];
       if (!form.city.trim()) nextErrors.city = ["City is required."];
       if (!form.address_line_1.trim()) nextErrors.address_line_1 = ["Address is required."];
+      if (form.country.trim() && !/^[A-Za-z]{2}$/.test(form.country.trim())) {
+        nextErrors.country = ["Country must be a 2-letter code (e.g. DZ)."];
+      }
     }
 
     if (targetStep === 2) {
@@ -240,8 +332,30 @@ export function CheckoutSection() {
 
   const firstStepForErrors = (allErrors: Record<string, string[]>): Step => {
     const keys = Object.keys(allErrors);
-    if (keys.some((key) => ["store_name", "store_email", "phone", "city", "address_line_1"].includes(key))) return 1;
-    if (keys.some((key) => ["logo"].includes(key))) return 2;
+    if (
+      keys.some((key) =>
+        [
+          "store_name",
+          "legal_name",
+          "description",
+          "store_email",
+          "phone",
+          "whatsapp_number",
+          "support_email",
+          "support_phone",
+          "website_url",
+          "address_line_1",
+          "address_line_2",
+          "city",
+          "state",
+          "postal_code",
+          "country",
+        ].includes(key)
+      )
+    ) {
+      return 1;
+    }
+    if (keys.some((key) => ["logo", "facebook_url", "instagram_url", "tiktok_url", "youtube_url", "x_url", "cover_image"].includes(key))) return 2;
     return 3;
   };
 
@@ -305,10 +419,21 @@ export function CheckoutSection() {
 
       const optionalFields: Array<keyof CheckoutForm> = [
         "legal_name",
+        "description",
         "whatsapp_number",
+        "support_email",
+        "support_phone",
+        "website_url",
+        "address_line_2",
+        "state",
+        "postal_code",
+        "country",
         "facebook_url",
         "instagram_url",
         "tiktok_url",
+        "youtube_url",
+        "x_url",
+        "cover_image",
       ];
 
       optionalFields.forEach((field) => {
@@ -439,13 +564,35 @@ export function CheckoutSection() {
                     {fieldError("store_name") && <p className="text-xs text-destructive">{fieldError("store_name")}</p>}
                   </div>
                   <div className="space-y-2 sm:col-span-2">
-                    <Label className={labelClassName} htmlFor="legal_name">Legal Name</Label>
+                    <div className="flex items-center justify-between gap-3">
+                      <Label className={labelClassName} htmlFor="legal_name">Legal Name</Label>
+                      <div className="flex items-center gap-2">
+                        <Label className="text-xs text-muted-foreground" htmlFor="same_legal_name">Same as store name</Label>
+                        <Switch
+                          id="same_legal_name"
+                          checked={autoFill.legal_name_from_store_name}
+                          onCheckedChange={(checked) => setAutoFillField("legal_name_from_store_name", checked)}
+                        />
+                      </div>
+                    </div>
                     <Input
                       id="legal_name"
                       className={inputClassName}
                       value={form.legal_name}
                       onChange={(e) => setField("legal_name", e.target.value)}
+                      disabled={autoFill.legal_name_from_store_name}
                     />
+                    {fieldError("legal_name") && <p className="text-xs text-destructive">{fieldError("legal_name")}</p>}
+                  </div>
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label className={labelClassName} htmlFor="description">Store Description</Label>
+                    <Textarea
+                      id="description"
+                      className={cn(inputClassName, "min-h-[96px] py-3")}
+                      value={form.description}
+                      onChange={(e) => setField("description", e.target.value)}
+                    />
+                    {fieldError("description") && <p className="text-xs text-destructive">{fieldError("description")}</p>}
                   </div>
                   <div className="space-y-2">
                     <Label className={labelClassName} htmlFor="store_email">Store Email *</Label>
@@ -459,23 +606,84 @@ export function CheckoutSection() {
                     {fieldError("store_email") && <p className="text-xs text-destructive">{fieldError("store_email")}</p>}
                   </div>
                   <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-3">
+                      <Label className={labelClassName} htmlFor="support_email">Support Email</Label>
+                      <div className="flex items-center gap-2">
+                        <Label className="text-xs text-muted-foreground" htmlFor="same_support_email">Same as store email</Label>
+                        <Switch
+                          id="same_support_email"
+                          checked={autoFill.support_email_from_store_email}
+                          onCheckedChange={(checked) => setAutoFillField("support_email_from_store_email", checked)}
+                        />
+                      </div>
+                    </div>
+                    <Input
+                      id="support_email"
+                      type="email"
+                      className={inputClassName}
+                      value={form.support_email}
+                      onChange={(e) => setField("support_email", e.target.value)}
+                      disabled={autoFill.support_email_from_store_email}
+                    />
+                    {fieldError("support_email") && <p className="text-xs text-destructive">{fieldError("support_email")}</p>}
+                  </div>
+                  <div className="space-y-2">
                     <Label className={labelClassName} htmlFor="phone">Phone *</Label>
                     <Input id="phone" className={inputClassName} value={form.phone} onChange={(e) => setField("phone", e.target.value)} />
                     {fieldError("phone") && <p className="text-xs text-destructive">{fieldError("phone")}</p>}
                   </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-3">
+                      <Label className={labelClassName} htmlFor="whatsapp_number">WhatsApp</Label>
+                      <div className="flex items-center gap-2">
+                        <Label className="text-xs text-muted-foreground" htmlFor="same_whatsapp">Same as phone</Label>
+                        <Switch
+                          id="same_whatsapp"
+                          checked={autoFill.whatsapp_number_from_phone}
+                          onCheckedChange={(checked) => setAutoFillField("whatsapp_number_from_phone", checked)}
+                        />
+                      </div>
+                    </div>
+                    <Input
+                      id="whatsapp_number"
+                      className={inputClassName}
+                      value={form.whatsapp_number}
+                      onChange={(e) => setField("whatsapp_number", e.target.value)}
+                      disabled={autoFill.whatsapp_number_from_phone}
+                    />
+                    {fieldError("whatsapp_number") && <p className="text-xs text-destructive">{fieldError("whatsapp_number")}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-3">
+                      <Label className={labelClassName} htmlFor="support_phone">Support Phone</Label>
+                      <div className="flex items-center gap-2">
+                        <Label className="text-xs text-muted-foreground" htmlFor="same_support_phone">Same as phone</Label>
+                        <Switch
+                          id="same_support_phone"
+                          checked={autoFill.support_phone_from_phone}
+                          onCheckedChange={(checked) => setAutoFillField("support_phone_from_phone", checked)}
+                        />
+                      </div>
+                    </div>
+                    <Input
+                      id="support_phone"
+                      className={inputClassName}
+                      value={form.support_phone}
+                      onChange={(e) => setField("support_phone", e.target.value)}
+                      disabled={autoFill.support_phone_from_phone}
+                    />
+                    {fieldError("support_phone") && <p className="text-xs text-destructive">{fieldError("support_phone")}</p>}
+                  </div>
+                  <br />
                   <div className="space-y-2">
                     <Label className={labelClassName} htmlFor="city">City *</Label>
                     <Input id="city" className={inputClassName} value={form.city} onChange={(e) => setField("city", e.target.value)} />
                     {fieldError("city") && <p className="text-xs text-destructive">{fieldError("city")}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label className={labelClassName} htmlFor="whatsapp_number">WhatsApp</Label>
-                    <Input
-                      id="whatsapp_number"
-                      className={inputClassName}
-                      value={form.whatsapp_number}
-                      onChange={(e) => setField("whatsapp_number", e.target.value)}
-                    />
+                    <Label className={labelClassName} htmlFor="state">State / Region</Label>
+                    <Input id="state" className={inputClassName} value={form.state} onChange={(e) => setField("state", e.target.value)} />
+                    {fieldError("state") && <p className="text-xs text-destructive">{fieldError("state")}</p>}
                   </div>
                   <div className="space-y-2 sm:col-span-2">
                     <Label className={labelClassName} htmlFor="address_line_1">Address Line 1 *</Label>
@@ -486,6 +694,37 @@ export function CheckoutSection() {
                       onChange={(e) => setField("address_line_1", e.target.value)}
                     />
                     {fieldError("address_line_1") && <p className="text-xs text-destructive">{fieldError("address_line_1")}</p>}
+                  </div>
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label className={labelClassName} htmlFor="address_line_2">Address Line 2</Label>
+                    <Input
+                      id="address_line_2"
+                      className={inputClassName}
+                      value={form.address_line_2}
+                      onChange={(e) => setField("address_line_2", e.target.value)}
+                    />
+                    {fieldError("address_line_2") && <p className="text-xs text-destructive">{fieldError("address_line_2")}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label className={labelClassName} htmlFor="postal_code">Postal Code</Label>
+                    <Input
+                      id="postal_code"
+                      className={inputClassName}
+                      value={form.postal_code}
+                      onChange={(e) => setField("postal_code", e.target.value)}
+                    />
+                    {fieldError("postal_code") && <p className="text-xs text-destructive">{fieldError("postal_code")}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label className={labelClassName} htmlFor="country">Country Code (2 letters)</Label>
+                    <Input
+                      id="country"
+                      className={inputClassName}
+                      value={form.country}
+                      maxLength={2}
+                      onChange={(e) => setField("country", e.target.value.toUpperCase())}
+                    />
+                    {fieldError("country") && <p className="text-xs text-destructive">{fieldError("country")}</p>}
                   </div>
                 </div>
               )}
@@ -544,6 +783,39 @@ export function CheckoutSection() {
                     />
                     {fieldError("tiktok_url") && <p className="text-xs text-destructive">{fieldError("tiktok_url")}</p>}
                   </div>
+                  <div className="space-y-2">
+                    <Label className={labelClassName} htmlFor="youtube_url">YouTube URL</Label>
+                    <Input
+                      id="youtube_url"
+                      type="url"
+                      className={inputClassName}
+                      value={form.youtube_url}
+                      onChange={(e) => setField("youtube_url", e.target.value)}
+                    />
+                    {fieldError("youtube_url") && <p className="text-xs text-destructive">{fieldError("youtube_url")}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label className={labelClassName} htmlFor="x_url">X (Twitter) URL</Label>
+                    <Input
+                      id="x_url"
+                      type="url"
+                      className={inputClassName}
+                      value={form.x_url}
+                      onChange={(e) => setField("x_url", e.target.value)}
+                    />
+                    {fieldError("x_url") && <p className="text-xs text-destructive">{fieldError("x_url")}</p>}
+                  </div>
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label className={labelClassName} htmlFor="cover_image">Cover Image URL</Label>
+                    <Input
+                      id="cover_image"
+                      type="url"
+                      className={inputClassName}
+                      value={form.cover_image}
+                      onChange={(e) => setField("cover_image", e.target.value)}
+                    />
+                    {fieldError("cover_image") && <p className="text-xs text-destructive">{fieldError("cover_image")}</p>}
+                  </div>
                 </div>
               )}
 
@@ -555,13 +827,24 @@ export function CheckoutSection() {
                     {fieldError("owner_name") && <p className="text-xs text-destructive">{fieldError("owner_name")}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label className={labelClassName} htmlFor="owner_email">Owner Email *</Label>
+                    <div className="flex items-center justify-between gap-3">
+                      <Label className={labelClassName} htmlFor="owner_email">Owner Email *</Label>
+                      <div className="flex items-center gap-2">
+                        <Label className="text-xs text-muted-foreground" htmlFor="same_owner_email">Same as store email</Label>
+                        <Switch
+                          id="same_owner_email"
+                          checked={autoFill.owner_email_from_store_email}
+                          onCheckedChange={(checked) => setAutoFillField("owner_email_from_store_email", checked)}
+                        />
+                      </div>
+                    </div>
                     <Input
                       id="owner_email"
                       type="email"
                       className={inputClassName}
                       value={form.owner_email}
                       onChange={(e) => setField("owner_email", e.target.value)}
+                      disabled={autoFill.owner_email_from_store_email}
                     />
                     {fieldError("owner_email") && <p className="text-xs text-destructive">{fieldError("owner_email")}</p>}
                   </div>
